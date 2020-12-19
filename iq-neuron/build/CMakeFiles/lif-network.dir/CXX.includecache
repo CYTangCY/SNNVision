@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/lif_network.h
+lif_neuron.h
+../include/lif_neuron.h
+weight_index_list.h
+../include/weight_index_list.h
+math.h
+-
+omp.h
+-
+
+../include/lif_neuron.h
+stdio.h
+-
+stdlib.h
+-
+
+../include/weight_index_list.h
+stdio.h
+-
+
+/home/chaoyangtang/SNNVision0.2/iq-neuron/src/lif_network.cpp
+lif_network.h
+/home/chaoyangtang/SNNVision0.2/iq-neuron/src/lif_network.h
+
+/home/chaoyangtang/SNNVision0.2/iq-neuron/src/lif_neuron.cpp
+lif_neuron.h
+/home/chaoyangtang/SNNVision0.2/iq-neuron/src/lif_neuron.h
+cmath
+/home/chaoyangtang/SNNVision0.2/iq-neuron/src/cmath
+
+/home/chaoyangtang/SNNVision0.2/iq-neuron/src/weight_index_list.cpp
+weight_index_list.h
+/home/chaoyangtang/SNNVision0.2/iq-neuron/src/weight_index_list.h
+

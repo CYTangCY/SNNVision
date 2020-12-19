@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC   -shared -Wl,-soname,liblif-network.so.0.0 -o liblif-network.so.0.0 CMakeFiles/lif-network.dir/src/lif_network.cpp.o CMakeFiles/lif-network.dir/src/lif_neuron.cpp.o CMakeFiles/lif-network.dir/src/weight_index_list.cpp.o  /usr/lib/gcc/x86_64-linux-gnu/9/libgomp.so /usr/lib/x86_64-linux-gnu/libpthread.so 

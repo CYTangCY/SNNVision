@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/iz_network.h
+iz_neuron.h
+../include/iz_neuron.h
+weight_index_list.h
+../include/weight_index_list.h
+math.h
+-
+omp.h
+-
+
+../include/iz_neuron.h
+stdio.h
+-
+stdlib.h
+-
+
+../include/weight_index_list.h
+stdio.h
+-
+
+/home/chaoyangtang/SNNVision0.2/iq-neuron/src/iz_network.cpp
+iz_network.h
+/home/chaoyangtang/SNNVision0.2/iq-neuron/src/iz_network.h
+
+/home/chaoyangtang/SNNVision0.2/iq-neuron/src/iz_neuron.cpp
+iz_neuron.h
+/home/chaoyangtang/SNNVision0.2/iq-neuron/src/iz_neuron.h
+
+/home/chaoyangtang/SNNVision0.2/iq-neuron/src/weight_index_list.cpp
+weight_index_list.h
+/home/chaoyangtang/SNNVision0.2/iq-neuron/src/weight_index_list.h
+
