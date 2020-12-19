@@ -110,7 +110,7 @@ class FileVideoStreamCroppedMono:
         if not self.grabbed:
             return False, None, None, None
         self.rawframe = self.preprocessor.cropFrameIntoSquare(self.rawframe)
-        self.frame = cv2.resize(self.rawframe, (640, 480), cv2.INTER_AREA)
+        self.frame = cv2.resize(self.rawframe, (160, 120), cv2.INTER_AREA)
         self.monoFrame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
         return True, self.rawframe, self.frame, self.monoFrame
 

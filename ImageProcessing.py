@@ -7,7 +7,7 @@ class VideoPreprocessor:
         self.cropBegin = 0
         self.cropEnd = 0
         self.cropHorW = ''
-        self.targetFrameSize = (640, 480)
+        self.targetFrameSize = (160, 120)
 
     def getSideLengthAfterCrop(self):
         return min(self.frameHW)
