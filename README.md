@@ -1,7 +1,7 @@
 # SNNVision
 related work from gogolexy and twetto
 
-System:debian and rasberrypi OS
+System:debian
 
 ## requirements
 (python3.7 ~ 3.8.6) 
@@ -19,7 +19,19 @@ scipy
 gcc or g++
 
 ## Usage
-python3 main.py
+open main.py 
 
-remove # in main.py display potential and activity
+set video resolution
+
+set SNN model and number of thread
+
+remove # in main.py display potential and activity(or not)
+
+enter video 
+
+enter IMU data
+
+enter virtual wall
+
+enter python3 main.py in terminal
 
