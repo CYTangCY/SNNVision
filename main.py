@@ -83,23 +83,10 @@ for line in pose:
 	tx, ty, tz, rx, ry = float(tx_), float(ty_), float(tz_), np.radians(float(rx_)), np.radians(float(ry_))
 	   
 	# rotation in radius
-	Rh = np.array([[1,			0,			 0],
-				  [ 0, np.cos(prx), -np.sin(prx)],
-				  [ 0, np.sin(prx),  np.cos(prx)]])
-	Ry = np.array([[np.cos(ry-pry), 0, np.sin(ry-pry)],
-				  [		  0,	  1,			   0],
-				  [-np.sin(ry-pry), 0, np.cos(ry-pry)]])
-	Rx = np.array([[1,		   0,			0],
-				  [ 0, np.cos(-rx), -np.sin(-rx)],
-				  [ 0, np.sin(-rx),  np.cos(-rx)]])
-	RI = np.eye(3, 3)
+	Rh, Ry, Rx, RI = opticalmodule.rotationinradius(rx,prx,ry,pry)
 	
 	# translation in meters
-	xd, yd, zd = tx-ptx, ty-pty, tz-ptz
-	zd = -zd
-	translation = [np.sqrt(xd**2+yd**2+zd**2)*np.sin(np.arctan2(np.sqrt(xd**2+zd**2),yd)-rx)*np.cos(np.pi/2+np.arctan2(-xd,zd)+ry),
-			np.sqrt(xd**2+yd**2+zd**2)*np.cos(np.arctan2(np.sqrt(xd**2+zd**2),yd)-rx),
-			np.sqrt(xd**2+yd**2+zd**2)*np.sin(np.arctan2(np.sqrt(xd**2+zd**2),yd)-rx)*np.sin(np.pi/2+np.arctan2(-xd,zd)+ry)]
+	translation = opticalmodule.translationinmeters(tx,ptx,ty,pty,tz,ptz,rx,ry)
 	translation = np.array(translation).reshape(3, 1)
 	translation_O = [0, 0, 0]
 	translation_O = np.array(translation_O).reshape(3, 1)
@@ -110,40 +97,47 @@ for line in pose:
 	
 	start_flow = timer()
 				  
-	# calculate optical flow 
+	#calculate optical flow 
 	OptFlow = algo.calculateOpticalFlow(prvs, curr).flatten()
+	OptFlow = np.array(OptFlow)
 	OptFlow = opticalmodule.reshapearray(OptFlow,width,height)
-	meanOptFlow = opticalmodule.meanFlow(OptFlow,width,height).flatten()
+	meanOptFlow = opticalmodule.meanFlowFirst(OptFlow,width,height)
+	meanOptFlow = opticalmodule.meanFlowSecond(meanOptFlow).flatten()
 	meanmeanOptFlow = opticalmodule.meanmeanFlow(meanOptFlow)
 	OBOptFlow = np.abs(meanmeanOptFlow)
-	norOptFlow = [ normO / 10 for normO in OBOptFlow ]
+	norOptFlow = opticalmodule.NormalizeFlow(OBOptFlow)
+
 	
-	#idealRotation Flow
+	#calculate idealRotation Flow
 	idealRotateFlow = opticalmodule.RYP(wall, K, Rt_rotate,width,height).flatten()
+	idealRotateFlow = np.array(idealRotateFlow)
 	idealRotateFlow = opticalmodule.reshapearray(idealRotateFlow,width,height)
-	meanIRFlow = opticalmodule.meanFlow(idealRotateFlow,width,height).flatten()
+	meanIRFlow = opticalmodule.meanFlowFirst(idealRotateFlow,width,height)
+	meanIRFlow = opticalmodule.meanFlowSecond(meanIRFlow).flatten()
 	meanmeanIRFlow = opticalmodule.meanmeanFlow(meanIRFlow)
 	OBIRFlow = np.abs(meanmeanIRFlow)
-	norIRFlow = [ normR / 10 for normR in OBIRFlow ]
+	norIRFlow = opticalmodule.NormalizeFlow(OBIRFlow)
 	
-	#idealTranslation Flow
+	#calculate idealTranslation Flow
 	idealTranslationFlow = opticalmodule.xyz(wall, K, Rt_translate,width,height).flatten()
+	idealTranslationFlow = np.array(idealTranslationFlow)
 	idealTranslationFlow = opticalmodule.reshapearray(idealTranslationFlow,width,height)
-	meanITFlow = opticalmodule.meanFlow(idealTranslationFlow,width,height).flatten()
+	meanITFlow = opticalmodule.meanFlowFirst(idealTranslationFlow,width,height)
+	meanITFlow =  opticalmodule.meanFlowSecond(meanITFlow).flatten()
 	meanmeanITFlow = opticalmodule.meanmeanFlow(meanITFlow)
 	OBITFlow = np.abs(meanmeanITFlow)
-	norITFlow = [ normT / 10 for normT in OBITFlow ]
+	norITFlow = opticalmodule.NormalizeFlow(OBITFlow)
 	
-	#FrameDifference
+	#calculate FrameDifference
 	Framedifference = algo.calculateFrameDifference(prvs, curr).flatten()
+	Framedifference = np.array(Framedifference)
 	meanFD = opticalmodule.meanFrameDifference(Framedifference,width,height).flatten()
 	meanmeanFD = opticalmodule.meanmeanFlow(meanFD)
 	FDcurrent = [ FDthreshold - FDcur for FDcur in meanmeanFD ]
 	NFDcurrent = np.array(FDcurrent)
-	NFDcurrent = [ FDcur / 10 for FDcur in NFDcurrent ]
+	NFDcurrent = opticalmodule.NormalizeFlow(NFDcurrent)
 	NFDcurrent = np.maximum(NFDcurrent, 0)
 
-	time_flow += timer() - start_flow
 	# generate neuron input currents
 	neuronCurrents = np.concatenate((norOptFlow, norIRFlow, NFDcurrent, norITFlow), axis=None)
 	IntneuronCurrents = [ round(float(INC),3) for INC in neuronCurrents ] 

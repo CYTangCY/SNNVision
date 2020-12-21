@@ -6,7 +6,7 @@ import numpy as nb
 from timeit import default_timer as timer
 
 # template wall translation flow
-@jit
+@jit(nopython = True)
 def xyz(wall, K, Rt_translate,width,height):
 	hg = 10//2
 	arrayidealVectorT = np.zeros((width,height,2))
@@ -22,60 +22,63 @@ def xyz(wall, K, Rt_translate,width,height):
 			for j in range(x-hg, x+hg):
 				arrayidealVectorT[i,j,0] = ut
 				arrayidealVectorT[i,j,1] = vt
-		#print(arrayidealVectorT[320,470])
+				
 	return arrayidealVectorT
 
 # template wall ideal rotation flow	
-@jit
+@jit(nopython = True)
 def RYP(wall, K, Rt_rotate,width,height):
 	hg = 10//2
 	arrayidealVectorRT = np.zeros((width,height,2))
 	for point in wall:	
 		x, y = int(point[0]), int(point[1]) 
-		#print('x:',x)
 		[ur, vr, wr] = K @ Rt_rotate @ np.array([point[4], point[5], point[6],1])
-		#print('OOur:',ur)
 		ur = ur/wr
-		#print('Our:',ur)
 		vr = vr/wr
 		wr = 1.0
 		ur = ur-x
 		vr = vr-y
-		#print('ur:',ur)
-		#print('vr:',vr-y)
 		for i in range(y-hg, y+hg):
 			for j in range(x-hg, x+hg):
 				arrayidealVectorRT[i,j,0] = ur
 				arrayidealVectorRT[i,j,1] = vr
-		#print(arrayidealVectorRT[320,470])
+				
 	return arrayidealVectorRT
+	
 
 def reshapearray(flow,width,height):
 	flow = flow.reshape((width,height, 2))
+	
 	return flow
 
-def meanFlow(flow,width,height):
+
+def meanFlowFirst(flow,width,height):
 	flowX = flow[:, :, 0]
 	flowY = flow[:, :, 1]
-	#shape = (8, 8)
-	#sh = shape[0],flow.shape[0]//shape[0],shape[1],flow.shape[1]//shape[1]
 	sh = (8, int(height/8), 8, int(width/8))
 	meanFlowX = flowX.reshape(sh).mean(-1).mean(1)
 	meanFlowY = flowY.reshape(sh).mean(-1).mean(1)
 	meanFlow = np.dstack((meanFlowX, meanFlowY))
+	
+	return meanFlow
+
+@jit(nopython = True)	
+def meanFlowSecond(meanFlow):
 	meanFlowyes = np.zeros((8,8))
 	for i in range(8):
 		for j in range(8):
 			meanFlowyes[i,j] = np.sqrt(meanFlow[i,j,0]**2+meanFlow[i,j,1]**2)
-	#print("fufu:",meanFlowyes[4,7])
+			
 	return meanFlowyes
-		 
+
+	 
 def meanFrameDifference(diff,width,height):
 	diff = diff.reshape((width,height))
 	sh = (8, int(height/8), 8, int(width/8))
 	meanDiff = diff.reshape(sh).mean(-1).mean(1)
+	
 	return meanDiff
- 
+
 def meanmeanFlow_old(meanflow):
 	OBmeanflow = []
 	meanmeanflowup = ((meanflow[0]+meanflow[1]+meanflow[2]+meanflow[3]+meanflow[4]+meanflow[5]+meanflow[6]+meanflow[7]+meanflow[9]+meanflow[10]+meanflow[11]+meanflow[12]+meanflow[13]+meanflow[14]) / 14)
@@ -111,6 +114,37 @@ def meanmeanFlow(meanflow):
 	OBmeanflow.append(meanmeanflow8 )
 
 	return OBmeanflow
+	
+@jit
+def translationinmeters(tx,ptx,ty,pty,tz,ptz,rx,ry):
+	xd, yd, zd = tx-ptx, ty-pty, tz-ptz
+	zd = -zd
+	translation = [np.sqrt(xd**2+yd**2+zd**2)*np.sin(np.arctan2(np.sqrt(xd**2+zd**2),yd)-rx)*np.cos(np.pi/2+np.arctan2(-xd,zd)+ry),
+			np.sqrt(xd**2+yd**2+zd**2)*np.cos(np.arctan2(np.sqrt(xd**2+zd**2),yd)-rx),
+			np.sqrt(xd**2+yd**2+zd**2)*np.sin(np.arctan2(np.sqrt(xd**2+zd**2),yd)-rx)*np.sin(np.pi/2+np.arctan2(-xd,zd)+ry)]
+			
+	return translation
+
+	
+def rotationinradius(rx,prx,ry,pry):
+	Rh = np.array([[1,			0,			 0],
+				  [ 0, np.cos(prx), -np.sin(prx)],
+				  [ 0, np.sin(prx),  np.cos(prx)]])
+	Ry = np.array([[np.cos(ry-pry), 0, np.sin(ry-pry)],
+				  [		  0,	  1,			   0],
+				  [-np.sin(ry-pry), 0, np.cos(ry-pry)]])
+	Rx = np.array([[1,		   0,			0],
+				  [ 0, np.cos(-rx), -np.sin(-rx)],
+				  [ 0, np.sin(-rx),  np.cos(-rx)]])
+	RI = np.eye(3, 3)
+	
+	return Rh, Ry ,Rx, RI
+
+@jit	
+def NormalizeFlow(flow):
+	norFlow = [ normR / 10 for normR in flow ]
+	
+	return norFlow
 	
 	
 	
