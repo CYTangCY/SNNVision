@@ -19,5 +19,18 @@ scipy
 gcc or g++
 
 ## Usage
-just enter python3 main.py in terminal
+open main.py 
+
+set video resolution
+
+set SNN model and number of thread
+
+enter video 
+
+enter IMU data
+
+enter virtual wall
+
+enter python3 main.py in terminal
+
 
