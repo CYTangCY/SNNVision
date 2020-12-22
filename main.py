@@ -28,8 +28,8 @@ height = int(120)
 snn = SNN("lif", 1)
 
 #display activity
-#spikes = [0]
-#guiSpike = Graphics.Spike(snn.getNumNeurons())
+spikes = [0]
+guiSpike = Graphics.Spike(snn.getNumNeurons())
 
 #display potential
 #potentials = [0]
@@ -151,8 +151,8 @@ for line in pose:
 
 	activity = snn.getFirstNActivityInOrder(32)
 	guiObstacle.display(raw, activity, realtimeFPS)
-	#spikes = activity[-10 * snn.getNumNeurons():]
-	#guiSpike.display(spikes, snn.getNumNeurons())
+	spikes = activity[-10 * snn.getNumNeurons():]
+	guiSpike.display(spikes, snn.getNumNeurons())
 	#potentials = potentials[-500 * snn.getNumNeurons():]
 	#guiPotential.display(potentials, snn.getNumNeurons())
 	prvs = curr
