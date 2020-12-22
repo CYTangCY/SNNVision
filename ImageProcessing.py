@@ -2,9 +2,9 @@ import cv2
 
 class VideoPreprocessor:
 
-    def __init__(self, videoHeight, videoWidth):
+    def __init__(self, videoHeight, videoWidth, width, height):
         self.frameHW = (videoHeight, videoWidth)
-        self.targetFrameSize = (160, 120)
+        self.targetFrameSize = (width, height)
 
     def FrameInput(self, frame):
         return frame

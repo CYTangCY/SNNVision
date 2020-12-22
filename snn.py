@@ -7,13 +7,13 @@ class SNN:
         if useWhatModel == 'iz':
             self.network = iqif.iznet()
             self.numNeurons = self.network.num_neurons()
-        elif useWhatModel == 'lif':
-            self.network = iqif.lifnet()
-            self.numNeurons = self.network.num_neurons() 
-        else:
+        elif useWhatModel == 'iq':
             self.network = iqif.iqnet()
             self.network.set_num_threads(thread)
             self.numNeurons = self.network.num_neurons()
+        else:
+            self.network = iqif.lifnet()
+            self.numNeurons = self.network.num_neurons() 
 
     def stimulate(self, neuronID, current):
         self.network.set_biascurrent(neuronID, current)

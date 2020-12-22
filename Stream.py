@@ -7,16 +7,16 @@ import ImageProcessing
 
 class VideoStreamMono:
 
-    def __init__(self, src=0, usePiCamera=False, resolution=(640, 480), framerate=50):
+    def __init__(self, src=0, usePiCamera=False, resolution=(640, 480), framerate=50, width=160, height=120):
         if usePiCamera:
             from PiOnly import PiVideoStreamMono
             self.stream = PiVideoStreamMono(resolution=resolution, framerate=framerate)
         elif src != 0:
-            self.stream = FileVideoStreamCroppedMono(src = src)
+            self.stream = FileVideoStreamCroppedMono(src = src, width=width, height=height)
         else:
             if platform.system() == "Linux":
                 src = 0 + cv2.CAP_V4L2
-            self.stream = WebcamVideoStreamCroppedMono(src = src)
+            self.stream = WebcamVideoStreamCroppedMono(src = src, width=width, height=height)
 
     def start(self):
         return self.stream.start()
@@ -32,7 +32,8 @@ class VideoStreamMono:
 
 class WebcamVideoStreamCroppedMono:
 
-    def __init__(self, src = 0):
+    def __init__(self, src = 0, width=0, height=0):
+
         self.stream = cv2.VideoCapture(src)
         #(self.grabbed, self.rawframe) = self.stream.read()
         self.grabbed = False
@@ -41,13 +42,13 @@ class WebcamVideoStreamCroppedMono:
         self.stopped = False
         fwidth = int( self.stream.get(cv2.CAP_PROP_FRAME_WIDTH) )
         fheight = int( self.stream.get(cv2.CAP_PROP_FRAME_HEIGHT) )
-        self.preprocessor = ImageProcessing.VideoPreprocessor(fheight, fwidth)
+        self.preprocessor = ImageProcessing.VideoPreprocessor(fheight, fwidth, width, height)
 
     def start(self):
         Thread(target=self.update, args=(), daemon=True).start()
         return self
 
-    def update(self):
+    def update(self, width, height):
         while True:
             if self.stopped:
                 return
@@ -58,7 +59,7 @@ class WebcamVideoStreamCroppedMono:
                 return
 
             self.rawframe = self.preprocessor.FrameInput(self.rawframe)
-            self.frame = cv2.resize(self.rawframe, (160, 120), cv2.INTER_AREA)
+            self.frame = cv2.resize(self.rawframe, (width, height), cv2.INTER_AREA)
             self.monoFrame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
 
     def read(self):
@@ -69,7 +70,7 @@ class WebcamVideoStreamCroppedMono:
 
 class FileVideoStreamCroppedMono:
 
-    def __init__(self, src = 0):
+    def __init__(self, src = 0, width=0, height=0):
         self.stream = cv2.VideoCapture(src)
         #(self.grabbed, self.rawframe) = self.stream.read()
         self.grabbed = False
@@ -81,23 +82,17 @@ class FileVideoStreamCroppedMono:
         fheight = int( self.stream.get(cv2.CAP_PROP_FRAME_HEIGHT) )
         self.fwidth = int(fwidth)
         self.fheight = int(fheight)
-        self.preprocessor = ImageProcessing.VideoPreprocessor(fheight, fwidth)
-
-    def getwidth(self):
-        return self.fwidth
-        
-    def getheight(self):
-        return self.fheight
+        self.preprocessor = ImageProcessing.VideoPreprocessor(fheight, fwidth, width, height)
 
     def start(self):
         return self
 
-    def read(self):
+    def read(self, width, height):
         (self.grabbed, self.rawframe) = self.stream.read()
         if not self.grabbed:
             return False, None, None, None
         self.rawframe = self.preprocessor.FrameInput(self.rawframe)
-        self.frame = cv2.resize(self.rawframe, (160, 120), cv2.INTER_AREA)
+        self.frame = cv2.resize(self.rawframe, (width,height), cv2.INTER_AREA)
         self.monoFrame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
         return True, self.rawframe, self.frame, self.monoFrame
 

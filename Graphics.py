@@ -17,7 +17,7 @@ class Potential():
 			if index % 8 == 0:
 				self.win.nextRow()
 			self.plotPotentials = self.win.addPlot()
-			self.plotPotentials.setYRange(-10, 100, padding=0)
+			self.plotPotentials.setYRange(-5, 50, padding=0)
 			self.curvePotentials[index] = self.plotPotentials.plot(potentialY)
 
 	def display(self, potentials, numNeurons):

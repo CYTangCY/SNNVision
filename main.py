@@ -12,45 +12,71 @@ import Graphics
 import opticalmodule
 from timeit import default_timer as timer
 
-frameHW = (160, 120)
-frameRate = 30
-fourcc = cv2.VideoWriter_fourcc(*"MJPG")
-
-#saver setting
-#saver = cv2.VideoWriter('output2' + '.avi', fourcc, 30, (640, 480))
-saver = None
+ap = argparse.ArgumentParser()
+ap.add_argument("-t", "--num-threads", type=int, default=1, help="# of threads to accelerate")
+ap.add_argument("-dp", "--display-potential", help="Whether or not neural potentials should be displayed", action="store_true")
+ap.add_argument("-do", "--display-obstacle", help="Whether or not obstacles should be displayed", action="store_true")
+ap.add_argument("-da", "--display-activity", help="Whether or not activity should be displayed", action="store_true")
+ap.add_argument("-i", "--input", type=str, help="Input video file instead of live stream.")
+ap.add_argument("-p", "--pose", type=str, help="Input IMU data.")
+ap.add_argument("-w", "--wall", type=str, help="Input Virtual wall.")
+ap.add_argument("-o", "--output", type=str, help="Output processed video file for obstacle detection.")
+ap.add_argument("-m", "--models", type=str, help="Use Izhikevich = iz, Use Lif=lif")
+args = vars(ap.parse_args())
 
 #resolution setting
-width = int(160)
-height = int(120)
+width = int(input("please enter frame width: "))
+height = int(input("please enter frame height: "))
+
+frameHW = (160, 120)
+frameRate = 50
+
+#input setting
+if args["input"]:
+	vs = VideoStreamMono(src=args["input"], usePiCamera=False, resolution=frameHW, framerate=frameRate, width=width, height=height).start()
+else:
+	print("please enter input video name")
+	
+#IMU data setting
+if args["pose"]:
+	pose = open(args["pose"],'r')
+else:
+	print("please enter IMU data file name")	
+	
+#Virtual wall setting
+if args["wall"]:
+	wall = np.loadtxt(args["wall"])
+else:
+	print("please enter Virtual wall file name")	
+
+#saver setting
+if args["output"]:
+    fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+    saver = cv2.VideoWriter(args["output"] + '.avi', fourcc, 50, (640, 480))
+else:
+    saver = None
 
 #SNN model setting
-snn = SNN("lif", 1)
+snn = SNN(args["models"], args["num_threads"])
 
 #display activity
-spikes = [0]
-guiSpike = Graphics.Spike(snn.getNumNeurons())
+if args["display_activity"]:
+	spikes = [0]
+	guiSpike = Graphics.Spike(snn.getNumNeurons())
 
 #display potential
-#potentials = [0]
-#guiPotential = Graphics.Potential(snn.getNumNeurons())
+if args["display_potential"]:
+	potentials = [0]
+	guiPotential = Graphics.Potential(snn.getNumNeurons())
 
 #display obstacle
-guiObstacle = Graphics.Obstacle(threshold1 = 7, threshold2 = 10, saver=saver)
-
+if args["display_obstacle"]:
+	guiObstacle = Graphics.Obstacle(threshold1 = 5, threshold2 = 9, saver=saver)
    
 time.sleep(2.0)
-vs = VideoStreamMono("video.mkv", usePiCamera=False, resolution=frameHW, framerate=frameRate).start()
-
-#setting IMU data
-pose = open('pose.txt', 'r')
-
-#setting Virtual wall
-wall = np.loadtxt('wall.txt')
 
 algo = Algorithm()
-[ret, raw, _, prvs] = vs.read()
-
+[ret, raw, _, prvs] = vs.read(width, height)
 
 focalLength = min(height, width)/2/np.tan(35/180*np.pi)
 K = np.array([[focalLength, 0.0, width/2],
@@ -72,10 +98,10 @@ localfps = FPS().start()
 realtimeFPS = 0
 counter = 0
 
-[ret, raw, _, curr] = vs.read()
+[ret, raw, _, curr] = vs.read(width, height)
 key = cv2.waitKey(1)
 for line in pose:
-	[ret, raw, _, curr] = vs.read()
+	[ret, raw, _, curr] = vs.read(width, height)
 
 	time, tx_, ty_, tz_, rx_, ry_ = line.split()
 	time = float(time)
@@ -147,14 +173,22 @@ for line in pose:
 	
 	for index in range(50):
 		snn.run(1)
-		#potentials = potentials + snn.getAllPotential()
+		if args["display_potential"]:
+			potentials = potentials + snn.getAllPotential()
 
 	activity = snn.getFirstNActivityInOrder(32)
-	guiObstacle.display(raw, activity, realtimeFPS)
-	spikes = activity[-10 * snn.getNumNeurons():]
-	guiSpike.display(spikes, snn.getNumNeurons())
-	#potentials = potentials[-500 * snn.getNumNeurons():]
-	#guiPotential.display(potentials, snn.getNumNeurons())
+	
+	if args["display_obstacle"]:
+		guiObstacle.display(raw, activity, realtimeFPS)
+		
+	if args["display_activity"]:	
+		spikes = activity[-10 * snn.getNumNeurons():]
+		guiSpike.display(spikes, snn.getNumNeurons())
+	
+	if args["display_potential"]:
+		potentials = potentials[-500 * snn.getNumNeurons():]
+		guiPotential.display(potentials, snn.getNumNeurons())
+		
 	prvs = curr
 	ptime, ptx, pty, ptz, prx, pry = time, tx, ty, tz, rx, ry
 	

@@ -142,7 +142,7 @@ def rotationinradius(rx,prx,ry,pry):
 
 @jit	
 def NormalizeFlow(flow):
-	norFlow = [ normR / 10 for normR in flow ]
+	norFlow = [ normR / 5 for normR in flow ]
 	
 	return norFlow
 	
