@@ -30,9 +30,6 @@ class VideoStreamMono:
     def stop(self):
         self.stream.stop()
 
-    def getSideLength(self):
-        return self.stream.sideLength()
-
 
 class WebcamVideoStreamCroppedMono:
 
@@ -46,9 +43,6 @@ class WebcamVideoStreamCroppedMono:
         fwidth = int( self.stream.get(cv2.CAP_PROP_FRAME_WIDTH) )
         fheight = int( self.stream.get(cv2.CAP_PROP_FRAME_HEIGHT) )
         self.preprocessor = ImageProcessing.VideoPreprocessor(fheight, fwidth)
-        self.preprocessor.findSideToCrop()
-        self.preprocessor.findCropPoints()
-        self.sideLength = self.preprocessor.getSideLengthAfterCrop()
 
     def start(self):
         Thread(target=self.update, args=(), daemon=True).start()
@@ -64,7 +58,7 @@ class WebcamVideoStreamCroppedMono:
                 self.stop()
                 return
 
-            self.rawframe = self.preprocessor.cropFrameIntoSquare(self.rawframe)
+            self.rawframe = self.preprocessor.FrameInput(self.rawframe)
             self.frame = cv2.resize(self.rawframe, (160, 120), cv2.INTER_AREA)
             self.monoFrame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
 
@@ -73,9 +67,6 @@ class WebcamVideoStreamCroppedMono:
 
     def stop(self):
         self.stopped = True
-    
-    def getSideLength(self):
-        return self.sideLength
 
 
 class FileVideoStreamCroppedMono:
@@ -93,9 +84,7 @@ class FileVideoStreamCroppedMono:
         self.fwidth = int(fwidth)
         self.fheight = int(fheight)
         self.preprocessor = ImageProcessing.VideoPreprocessor(fheight, fwidth)
-        self.preprocessor.findSideToCrop()
-        self.preprocessor.findCropPoints()
-        self.sideLength = self.preprocessor.getSideLengthAfterCrop()
+        
     def getwidth(self):
         return self.fwidth
         
@@ -109,7 +98,7 @@ class FileVideoStreamCroppedMono:
         (self.grabbed, self.rawframe) = self.stream.read()
         if not self.grabbed:
             return False, None, None, None
-        self.rawframe = self.preprocessor.cropFrameIntoSquare(self.rawframe)
+        self.rawframe = self.preprocessor.FrameInput(self.rawframe)
         self.frame = cv2.resize(self.rawframe, (640, 480), cv2.INTER_AREA)
         self.monoFrame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
         return True, self.rawframe, self.frame, self.monoFrame
@@ -117,6 +106,4 @@ class FileVideoStreamCroppedMono:
     def stop(self):
         self.stopped = True
 
-    def getSideLength(self):
-        return self.sideLength
 
