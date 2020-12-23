@@ -8,6 +8,7 @@ from snn import SNN
 from timer import FPS
 from Stream import VideoStreamMono
 from ImageProcessing import Algorithm
+from ImageProcessing import VirtualWall
 import Graphics
 import opticalmodule
 from timeit import default_timer as timer
@@ -19,7 +20,6 @@ ap.add_argument("-do", "--display-obstacle", help="Whether or not obstacles shou
 ap.add_argument("-da", "--display-activity", help="Whether or not activity should be displayed", action="store_true")
 ap.add_argument("-i", "--input", type=str, help="Input video file instead of live stream.")
 ap.add_argument("-p", "--pose", type=str, help="Input IMU data.")
-ap.add_argument("-w", "--wall", type=str, help="Input Virtual wall.")
 ap.add_argument("-o", "--output", type=str, help="Output processed video file for obstacle detection.")
 ap.add_argument("-m", "--models", type=str, help="Use Izhikevich = iz, Use Lif=lif")
 args = vars(ap.parse_args())
@@ -28,6 +28,8 @@ args = vars(ap.parse_args())
 width = int(input("please enter frame width: "))
 height = int(input("please enter frame height: "))
 
+VW = VirtualWall()
+algo = Algorithm()
 frameHW = (160, 120)
 frameRate = 50
 
@@ -44,10 +46,7 @@ else:
 	print("please enter IMU data file name")	
 	
 #Virtual wall setting
-if args["wall"]:
-	wall = np.loadtxt(args["wall"])
-else:
-	print("please enter Virtual wall file name")	
+wall = VW.makewall(width,height,5)
 
 #saver setting
 if args["output"]:
@@ -75,7 +74,7 @@ if args["display_obstacle"]:
    
 time.sleep(2.0)
 
-algo = Algorithm()
+
 [ret, raw, _, prvs] = vs.read(width, height)
 
 focalLength = min(height, width)/2/np.tan(35/180*np.pi)

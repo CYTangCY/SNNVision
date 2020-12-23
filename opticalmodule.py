@@ -8,7 +8,7 @@ from timeit import default_timer as timer
 # template wall translation flow
 @jit(nopython = True)
 def xyz(wall, K, Rt_translate,width,height):
-	hg = 10//2
+	hg = (width//16)//2
 	arrayidealVectorT = np.zeros((width,height,2))
 	for point in wall:	 
 		x, y = int(point[0]), int(point[1])
@@ -28,7 +28,7 @@ def xyz(wall, K, Rt_translate,width,height):
 # template wall ideal rotation flow	
 @jit(nopython = True)
 def RYP(wall, K, Rt_rotate,width,height):
-	hg = 10//2
+	hg = (width//16)//2
 	arrayidealVectorRT = np.zeros((width,height,2))
 	for point in wall:	
 		x, y = int(point[0]), int(point[1]) 
@@ -78,21 +78,6 @@ def meanFrameDifference(diff,width,height):
 	meanDiff = diff.reshape(sh).mean(-1).mean(1)
 	
 	return meanDiff
-
-def meanmeanFlow_old(meanflow):
-	OBmeanflow = []
-	meanmeanflowup = ((meanflow[0]+meanflow[1]+meanflow[2]+meanflow[3]+meanflow[4]+meanflow[5]+meanflow[6]+meanflow[7]+meanflow[9]+meanflow[10]+meanflow[11]+meanflow[12]+meanflow[13]+meanflow[14]) / 14)
-	OBmeanflow.append(meanmeanflowup )
-	meanmeanflowleft = ((meanflow[8]+meanflow[9]+meanflow[16]+meanflow[17]+meanflow[24]+meanflow[25]+meanflow[32]+meanflow[33]+meanflow[40]+meanflow[41]+meanflow[48]+meanflow[49]) / 12)
-	OBmeanflow.append(meanmeanflowleft )
-	meanmeanflowdown = ((meanflow[49]+meanflow[50]+meanflow[51]+meanflow[52]+meanflow[53]+meanflow[54]+meanflow[56]+meanflow[57]+meanflow[58]+meanflow[59]+meanflow[60]+meanflow[61]+meanflow[62]+meanflow[63]) / 14)
-	OBmeanflow.append(meanmeanflowdown )
-	meanmeanflowright = ((meanflow[14]+meanflow[15]+meanflow[22]+meanflow[23]+meanflow[30]+meanflow[31]+meanflow[38]+meanflow[39]+meanflow[46]+meanflow[47]+meanflow[54]+meanflow[55]) / 12)
-	OBmeanflow.append(meanmeanflowright )
-	meanmeanflowmid = ((meanflow[18]+meanflow[19]+meanflow[20]+meanflow[21]+meanflow[26]+meanflow[27]+meanflow[28]+meanflow[29]+meanflow[34]+meanflow[35]+meanflow[36]+meanflow[37]+meanflow[42]+meanflow[43]+meanflow[44]+meanflow[45]) / 16)	
-	OBmeanflow.append(meanmeanflowmid )
-	   
-	return OBmeanflow
 	
 def meanmeanFlow(meanflow):
 	OBmeanflow = []
