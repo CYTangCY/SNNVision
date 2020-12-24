@@ -1,8 +1,9 @@
-
 # SNNVision
 related work from gogolexy and twetto
 
 System:rasberrypi OS
+
+![image](https://github.com/CYTangCY/SNNVision/blob/RasberryPi_Version/report_image.png)
 
 ## first
 
