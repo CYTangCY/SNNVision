@@ -34,13 +34,21 @@ scipy
 ## Usage
 
 python3 main.py 
+
 "-t" "--num-threads" (type=int, default=1, help="# of threads to accelerate")
+
 "-dp" "--display-potential" (help="Whether or not neural potentials should be displayed")(for computer)
+
 "-do" "--display-obstacle" (help="Whether or not obstacles should be displayed")
+
 "-da" "--display-activity" (help="Whether or not activity should be displayed")(for computer)
+
 "-i" "--input", type=str (help="Input video file instead of live stream.")
+
 "-p" "--pose", type=str (help="Input IMU data.")
+
 "-o" "--output", type=str (help="Output processed video file for obstacle detection.")
+
 "-m" "--models", type=str (help="Use Izhikevich = iz, Use Lif=lif")
 
 
