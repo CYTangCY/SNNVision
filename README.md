@@ -1,4 +1,5 @@
 # SNNVision
+
 related work from gogolexy and twetto
 
 System:rasberrypi OS
@@ -8,9 +9,11 @@ System:rasberrypi OS
 ## first
 
 sudo apt update
+
 sudo pip3 install --upgrade pip
 
 ## system package requirements:
+
 sudo apt install -y libatlas-base-dev libhdf5-dev libhdf5-serial-dev libatlas-base-dev libjasper-dev  libqtgui4  libqt4-test cmake llvm gcc g++ qt5-default
 
 ## python requirements
