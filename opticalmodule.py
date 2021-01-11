@@ -101,15 +101,22 @@ def meanmeanFlow(meanflow):
 	return OBmeanflow
 	
 @jit
-def translationinmeters(tx,ptx,ty,pty,tz,ptz,rx,ry):
+def translationinmeters(tx, ptx, ty, pty, tz, ptz, rx, ry):
 	xd, yd, zd = tx-ptx, ty-pty, tz-ptz
-	zd = -zd
 	translation = [np.sqrt(xd**2+yd**2+zd**2)*np.sin(np.arctan2(np.sqrt(xd**2+zd**2),yd)-rx)*np.cos(np.pi/2+np.arctan2(-xd,zd)+ry),
 			np.sqrt(xd**2+yd**2+zd**2)*np.cos(np.arctan2(np.sqrt(xd**2+zd**2),yd)-rx),
 			np.sqrt(xd**2+yd**2+zd**2)*np.sin(np.arctan2(np.sqrt(xd**2+zd**2),yd)-rx)*np.sin(np.pi/2+np.arctan2(-xd,zd)+ry)]
 			
 	return translation
 
+@jit
+def translationinmeters_real(tx, ty, tz, rx, ry):
+	xd, yd, zd = tx, ty, tz
+	translation = [np.sqrt(xd**2+yd**2+zd**2)*np.sin(np.arctan2(np.sqrt(xd**2+zd**2),yd)-rx)*np.cos(np.pi/2+np.arctan2(-xd,zd)+ry),
+			np.sqrt(xd**2+yd**2+zd**2)*np.cos(np.arctan2(np.sqrt(xd**2+zd**2),yd)-rx),
+			np.sqrt(xd**2+yd**2+zd**2)*np.sin(np.arctan2(np.sqrt(xd**2+zd**2),yd)-rx)*np.sin(np.pi/2+np.arctan2(-xd,zd)+ry)]
+			
+	return translation
 	
 def rotationinradius(rx,prx,ry,pry):
 	Rh = np.array([[1,			0,			 0],
@@ -127,7 +134,7 @@ def rotationinradius(rx,prx,ry,pry):
 
 @jit	
 def NormalizeFlow(flow):
-	norFlow = [ normR / 5 for normR in flow ]
+	norFlow = [ normR / 10 for normR in flow ]
 	
 	return norFlow
 	

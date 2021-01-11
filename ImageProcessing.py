@@ -3,6 +3,7 @@ import numpy as np
 from numpy import linalg as LA
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from numba import jit
 
 class VideoPreprocessor:
 
@@ -39,10 +40,28 @@ class Algorithm:
         blur = cv2.GaussianBlur(frame_c,kernel_size,sigma)
         unsharpFrame = cv2.addWeighted(frame_c, 5, blur, -4, 0, frame_c)
         return unsharpFrame
+    
+    def ConvertToDisplacement(self, tx, ty, tz, rx, ry, time , ptime, v0x, v0y, v0z, timestep, txfix, tyfix, tzfix):
+        tx, ty, tz, rx, ry = (((tx+txfix)*9.8)*timestep), -((ty+tyfix)*9.8*timestep), -((tz+tzfix)*9.8*timestep) ,(rx*timestep), -(ry*timestep)
+        ax = tx
+        ay = ty
+        az = tz
+        print(round(tx,1), round(ty,1), round(tz,1), round(rx,1), round(ry,1), round(v0x,1), round(v0y,1), round(v0z,1) )
+        dt = time - ptime
+        tx = v0x*dt + 0.5*ax*dt*dt
+        ty = v0y*dt + 0.5*ay*dt*dt
+        tz = v0z*dt + 0.5*az*dt*dt
+        v0x += ax*dt
+        v0y += ay*dt
+        v0z += az*dt
+        rx += rx
+        ry += ry    
+        
+        return tx, ty, tz, rx, ry, v0x, v0y, v0z 
         
 class VirtualWall:
 	
-	def makewall(self, width, height,WallDistance):
+	def makewall(self, width, height, WallDistance):
 		width = width
 		height = height
 		WallDistance = WallDistance

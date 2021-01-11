@@ -25,8 +25,8 @@ ap.add_argument("-m", "--models", type=str, help="Use Izhikevich = iz, Use Lif=l
 args = vars(ap.parse_args())
 
 #resolution setting
-width = int(input("please enter frame width: "))
-height = int(input("please enter frame height: "))
+width = int(input("please enter the frame width: "))
+height = int(input("please enter the frame height: "))
 
 VW = VirtualWall()
 algo = Algorithm()
@@ -45,9 +45,6 @@ if args["pose"]:
 else:
 	print("please enter IMU data file name")	
 	
-#Virtual wall setting
-wall = VW.makewall(width,height,5)
-
 #saver setting
 if args["output"]:
     fourcc = cv2.VideoWriter_fourcc(*"MJPG")
@@ -71,6 +68,9 @@ if args["display_potential"]:
 #display obstacle
 if args["display_obstacle"]:
 	guiObstacle = Graphics.Obstacle(threshold1 = 5, threshold2 = 9, saver=saver)
+
+#Virtual wall 
+wall = VW.makewall(width,height,3)
    
 time.sleep(2.0)
 
@@ -89,7 +89,7 @@ frame_count = 0
 time_flow = 0
 time_rt = 0
 time_depth = 0
-FDthreshold = 6
+FDthreshold = 3
 
 
 fps = FPS().start()
@@ -165,7 +165,7 @@ for line in pose:
 
 	# generate neuron input currents
 	neuronCurrents = np.concatenate((norOptFlow, norIRFlow, NFDcurrent, norITFlow), axis=None)
-	IntneuronCurrents = [ round(float(INC),3) for INC in neuronCurrents ] 
+	IntneuronCurrents = [ round(float(INC),5) for INC in neuronCurrents ] 
 			
 	# Neuron simulation
 	snn.stimulateInOrder(IntneuronCurrents)
