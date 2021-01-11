@@ -1,9 +1,22 @@
 # SNNVision
+
 related work from gogolexy and twetto
 
 System:rasberrypi OS
 
-## requirements
+![image](https://github.com/CYTangCY/SNNVision/blob/RasberryPi_Version/report_image.png)
+
+## first
+
+sudo apt update
+
+sudo pip3 install --upgrade pip
+
+## system package requirements:
+
+sudo apt install -y libatlas-base-dev libhdf5-dev libhdf5-serial-dev libatlas-base-dev libjasper-dev  libqtgui4  libqt4-test cmake llvm gcc g++ qt5-default
+
+## python requirements
 
 (python3.7 ~ 3.8.6) 
 
@@ -15,34 +28,34 @@ opencv 4.2.0 or higher
 
 pyqtgraph
 
-pyqt5
+llvmlite 0.32.0 or higher
 
 numba 0.49.0 - 0.52.0
 
-### numba requirements:
-llvmlite 0.30.0 or higher
-
-LLVM 7.0 or higher
-
 scipy
 
-gcc or g++
-
+### pyqt5 (need compile 1~2 hour with RasberryPi 4)
 
 ## Usage
 
-open main.py 
+python3 main.py 
 
-set video resolution
+"-t" "--num-threads" (type=int, default=1, help="# of threads to accelerate")
 
-set SNN model and number of thread
+"-dp" "--display-potential" (help="Whether or not neural potentials should be displayed")(for computer)
 
-enter video 
+"-do" "--display-obstacle" (help="Whether or not obstacles should be displayed")
 
-enter IMU data
+"-da" "--display-activity" (help="Whether or not activity should be displayed")(for computer)
 
-enter virtual wall
+"-i" "--input", type=str (help="Input video file instead of live stream.")
 
-enter python3 main.py in terminal
+"-p" "--pose", type=str (help="Input IMU data.")
+
+"-o" "--output", type=str (help="Output processed video file for obstacle detection.")
+
+"-m" "--models", type=str (help="Use Izhikevich = iz, Use Lif=lif")
+
+
 
 
